@@ -21,4 +21,10 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function selectedProducts()
+{
+    return $this->belongsToMany(Product::class);
+}
+
 }

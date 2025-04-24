@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -38,5 +40,23 @@ class ProductController extends Controller
             'message' => 'Produto cadastrado com sucesso.',
             'product' => $product,
         ]);
+    }
+
+    public function storeSelection(Request $request)
+    {
+        $request->validate([
+            'product_ids' => 'required|array',
+            'product_ids.*' => 'integer|exists:products,id',
+        ]);
+
+        $user = Auth::user();
+
+        // Aqui vamos apenas salvar os IDs como JSON num campo fictício
+        // Em produção, talvez seja uma tabela com relacionamento
+
+        $user->selected_products = json_encode($request->product_ids);
+        $user->save();
+
+        return response()->json(['message' => 'Seleção salva com sucesso']);
     }
 }

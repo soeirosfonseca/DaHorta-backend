@@ -1,6 +1,10 @@
+import 'package:dahorta_app/screens/ProductSelectionScreen.dart';
+import 'package:dahorta_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/auth_service.dart';
+// ignore: unused_import
+import '../providers/auth_provider.dart';
+import '../providers/UserProvider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,6 +12,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
+    final user = context.watch<UserProvider>().name;
 
     return Scaffold(
       appBar: AppBar(
@@ -41,6 +46,47 @@ class HomeScreen extends StatelessWidget {
                         Navigator.pushNamed(context, '/produtos');
                       },
                       child: const Text('Ver Produtos Disponíveis'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/assinatura');
+                      },
+                      child: const Text('Assinar uma cesta'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/pontos');
+                      },
+                      child: const Text('Ver Pontos de Coleta'),
+                    ),
+                    if (user?.isFarmer == true)
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/agricultor');
+                        },
+                        child: const Text('Área do Agricultor'),
+                      ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final plano = context.read<UserProvider>().user!.role;
+                        final limite = switch (plano) {
+                          'Simples' => 5,
+                          'Premium' => 8,
+                          'Master' => 12,
+                          _ => 5,
+                        };
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (_) => ProductSelectionScreen(
+                                  maxSelection: limite,
+                                ),
+                          ),
+                        );
+                      },
+                      child: const Text('Montar minha cesta'),
                     ),
                   ],
                 ),

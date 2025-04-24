@@ -1,6 +1,8 @@
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
-import '../models/product_model.dart';
+import '../models/product.dart';
 import '../services/api_service.dart';
+import '../widgets/AddProductDialog.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -15,7 +17,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   void initState() {
     super.initState();
-    _products = ApiService.fetchProducts();
+    _loadProducts();
+  }
+
+  void _loadProducts() {
+    setState(() {
+      _products = ApiService.fetchProducts();
+    });
+  }
+
+  void _openAddProductDialog() async {
+    final result = await showDialog(
+      context: context,
+      builder: (_) => const AddProductDialog(),
+    );
+
+    if (result == true) {
+      _loadProducts(); // Recarrega os produtos apenas se algo foi adicionado
+    }
   }
 
   @override
@@ -35,7 +54,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
           final products = snapshot.data!;
           if (products.isEmpty) {
-            return const Center(child: Text('Nenhum produto disponível no momento.'));
+            return const Center(
+              child: Text('Nenhum produto disponível no momento.'),
+            );
           }
 
           return ListView.builder(
@@ -50,6 +71,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddProductDialog,
+        child: const Icon(Icons.add),
       ),
     );
   }
